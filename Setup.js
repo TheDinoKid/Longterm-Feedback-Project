@@ -1,22 +1,16 @@
 function folderSetup() {
   var longtermFeedback = DriveApp.createFolder('Longterm Feedback');
   var masterFolder = longtermFeedback.createFolder('Master Sheet');
-  var file=SpreadsheetApp.create('Master Sheet')
-  masterFolder.addFile(DriveApp.getFileById(file.getId()));
-  DriveApp.getRootFolder().removeFile(DriveApp.getFileById(file.getId()));
+  var spreadsheet=SpreadsheetApp.create('Master Sheet')
+  masterFolder.addFile(DriveApp.getFileById(spreadsheet.getId()));
+  DriveApp.getRootFolder().removeFile(DriveApp.getFileById(spreadsheet.getId()));
   longtermFeedback.createFolder(new Date().getFullYear());
-  masterSheetSetup(file);
-  }
-function masterSheetSetup(spreadsheet){
   spreadsheet.getActiveSheet().setName('Hub').setColumnWidth(1, 185).setColumnWidth(2, 568).setColumnWidth(3, 197).setColumnWidth(4, 137).setColumnWidth(5, 203).setRowHeight(1, 61).setRowHeight(2, 61).setRowHeight(3, 61).deleteColumns(6,21);
   spreadsheet.getActiveSheet().deleteRows(121,880); 
   var values = [["Step 1:","insert student name","Year:",(new Date().getFullYear()),""],["Step 2:","Insert Year","","Student Name","Student Email"],["Step 3:","'Press Button","","",""]]
   spreadsheet.getRange('A1:E3').setValues(values); 
   spreadsheet.getRange('A1:B3').activate().setFontSize(36).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
   spreadsheet.getRange('C1:E2').activate().setFontSize(24).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
-  newYear(spreadsheet);
-  }
-function newYear(spreadsheet){
   yearlySpreadsheet = spreadsheet.insertSheet(1).setName('2021');
   yearlySpreadsheet.getRange(1, 1, yearlySpreadsheet.getMaxRows(), yearlySpreadsheet.getMaxColumns()).activate().setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
   yearlySpreadsheet.setColumnWidth(1, 150).setRowHeight(1, 50).setRowHeights(93, 3, 190).setFrozenRows(6);
