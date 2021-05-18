@@ -1,67 +1,50 @@
 /** @NotOnlyCurrentDoc */
-function Create_New_Table() {
-  var Startspreadsheet = SpreadsheetApp.getActive();
-  
 
-  var Profiles = []
-  var Row = 3
-  var cellN = 'd3'
-  while ((Startspreadsheet.getRange(cellN).getValue()).length > 1){
-    var cellN = 'd'+ Row
-    var cellE = 'e' + Row
-    var Profile = []
-    if ((Startspreadsheet.getRange(cellN).getValue()).length > 0);
-      var Name = (Startspreadsheet.getRange(cellN).getValue())
-      var Email = (Startspreadsheet.getRange(cellE).getValue())
-    var Row = Row + 1
-    Profile.push(Name,Email)
-    Profiles.push(Profile)
+//1k tests//(3s-6s)getNames 35 test average = 4.3
+function getNames() {
+  var times = []
+  times.push(new Date().getTime())
+  var hubSheet = SpreadsheetApp.getActive().getSheetByName("hub");
+  for (row = 3; (hubSheet.getRange('d'+ row).getValue()).length != 0 ; row++){}
+  profiles = [hubSheet.getRange('d3:d'+(row-1)).getValues()]
+  profiles.push(hubSheet.getRange('e3:e'+(row-1)).getValues())
+  times.push(new Date().getTime())
+  format(profiles,hubSheet,times)
   }
-  Profiles.splice(-1, 1);
+//1k tests//
+function format(profiles,hubSheet,times){
+  var spreadsheet = SpreadsheetApp.getActive().getSheetByName(hubSheet.getRange("D1").getValue());
+    spreadsheet.insertColumnsBefore(2,3*profiles[0].length)
+    var valuesB = [['Timestamp'],['=importrange(b4, "a2:c100")']]
+  for (i = 0; profiles[0].length != i; i++){
+    spreadsheet.getRange(1,2+(i*3),5,3).activate().mergeAcross();
+    spreadsheet.getRange(93,2+(i*3),3,3).activate().merge();
+    spreadsheet.setColumnWidth(3+(i*3), 238).setColumnWidth(4+(i*3), 284)
+    spreadsheet.getRange(6,2+(i*3),2,1).setValues(valuesB);
+    spreadsheet.getRange(1,2+(i*3),1,3).setValue(profiles[0][i] + "'s Longterm");
+    spreadsheet.getRange(5,2+(i*3),1,3).setValue(profiles[1][i]);
+    spreadsheet.getRange(6,3+(i*3),1,1).setValue('How would you rate the presentation?');
+    spreadsheet.getRange(6,4+(i*3),1,1).setValue('Do you have any feedback for the presenter?');
+    spreadsheet.getRange(93,2+(i*3),3,3).setValue('=if(isblank(B3), "No url, this is very bad and means Sean probably messed up. Way to go Sean.", image("https://image-charts.com/chart?chs=150x150&cht=qr&choe=UTF-8&chl="&ENCODEURL(B3))');}
+    times.push(new Date().getTime())
+    form(profiles,hubSheet,spreadsheet,times)}
 
-  console.log(Profiles)
-  var sheetname = Startspreadsheet.getRange("D1").getValue();
-  var spreadsheet = SpreadsheetApp.getActive().getSheetByName(sheetname);
-  while (Profiles.length > 0){
-    console.log(Profiles.length)
-    var studentName = Profiles[0][0]
-    var spreadsheet = SpreadsheetApp.getActive().getSheetByName(sheetname);
-    spreadsheet.getRange('B1').activate();
-    var spreadsheet = SpreadsheetApp.getActive()
-    spreadsheet.getActiveSheet().insertColumnsBefore(spreadsheet.getActiveRange().getColumn(), 3);
-    spreadsheet.getActiveRange().offset(0, 0, spreadsheet.getActiveRange().getNumRows(), 3).activate();
-    spreadsheet.getRange('B1:D5').activate().mergeAcross();
-    spreadsheet.getRange('B106:D108').activate().merge();
-    spreadsheet.getRange('B1:D1').activate().setValue(studentName + "'s Longterm");
-    spreadsheet.getRange('B5').activate().setValue(Profiles[0][1]);
-    spreadsheet.getRange('B6').activate().setValue('Timestamp');
-    spreadsheet.getRange('C6').activate().setValue('How would you rate the presentation?');
-    spreadsheet.getRange('D6').activate().setValue('Do you have any feedback for the presenter?');
-    spreadsheet.getRange('B7').activate().setFormula('=importrange(b4, "a2:c100")');
-    spreadsheet.getActiveSheet().setColumnWidth(3, 238).setColumnWidth(3, 238);
-    spreadsheet.getActiveSheet().setColumnWidth(4, 284);
-    var yearFolder = DriveApp.getFoldersByName(new Date().getFullYear()).next();
-    var studentFolder = yearFolder.createFolder(studentName);
-    FormApp.getActiveForm()
-    var form = FormApp.create(studentName + "'s Longterm");
-    var formId = form.getId()
 
-    var copyFile=DriveApp.getFileById(formId);
-    studentFolder.addFile(copyFile);
-    DriveApp.getRootFolder().removeFile(copyFile);
-    form.addScaleItem().setTitle('How would you rate the presentation').setBounds(1, 10);
-    form.addParagraphTextItem().setTitle('Do you have any feedback for the presenter?');
-    spreadsheet.getRange('B2').activate().setValue(form.getEditUrl()); 
-    spreadsheet.getRange('B3').activate().setValue(form.getPublishedUrl()); 	
-    var studentSpreadsheet = SpreadsheetApp.create(studentName + "'s Longterm (Responses)").addEditor(Profiles[0][1]);
-    form.setDestination(FormApp.DestinationType.SPREADSHEET, studentSpreadsheet.getId());
-    var copyFile=DriveApp.getFileById(studentSpreadsheet.getId());
-    studentFolder.addFile(copyFile);
-    DriveApp.getRootFolder().removeFile(copyFile);
-
-    GmailApp.sendEmail(Profiles[0][1], "Longterm Feedback", "Here is your link to open your Longterm Feedback Spreadsheet and your QR code. Please put the QR code at the end of your presentation. \n\nSpreadsheet: " + studentSpreadsheet.getUrl() + '\n\nQR Code: "https://image-charts.com/chart?chs=150x150&cht=qr&choe=UTF-8&chl=' + form.getPublishedUrl());
-    spreadsheet.getRange('B4').activate().setValue(studentSpreadsheet.getUrl()); 
-    spreadsheet.getRange('B193').activate().setValue('=if(isblank(B3), "No url, this is very bad and means Sean probably messed up. Way to go Sean.", image("https://image-charts.com/chart?chs=150x150&cht=qr&choe=UTF-8&chl="&ENCODEURL(B3)))');
-    Profiles.splice(0, 1);
-  }
-};
+function form(profiles,hubSheet,spreadsheet,times){
+      //need FormApp.getActiveForm()??
+      FormApp.getActiveForm()
+      for (i = 0; profiles[0].length != i; i++){
+        var studentFolder = (DriveApp.getFoldersByName(new Date().getFullYear()).next().createFolder(profiles[0][i]))
+        var form = ((FormApp.create(profiles[0][i] + "'s Longterm")));
+        form.addScaleItem().setTitle('How would you rate the presentation').setBounds(1, 10);
+        form.addParagraphTextItem().setTitle('Do you have any feedback for the presenter?');
+        studentFolder.getId().addFile(DriveApp.getFileById(form.getId()));
+        DriveApp.getRootFolder().removeFile(DriveApp.getFileById(form.getId()));
+        
+        }
+      //var studentSpreadsheet = SpreadsheetApp.create(studentName + "'s Longterm (Responses)").addEditor(Profiles[0][1]);
+      //form.setDestination(FormApp.DestinationType.SPREADSHEET, studentSpreadsheet.getId());
+      //studentFolder.addFile(DriveApp.getFileById(studentSpreadsheet.getId()));
+      //DriveApp.getRootFolder().removeFile(DriveApp.getFileById(studentSpreadsheet.getId()));
+      times.push(new Date().getTime())
+      console.log('getNames:',(times[2]-times[1])/1000,'s      format:',(times[3]-times[2])/1000,'s      forms:',(times[4]-times[3])/1000,'s      total:',(times[4]-times[1])/1000)}
