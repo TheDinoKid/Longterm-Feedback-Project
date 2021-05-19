@@ -1,6 +1,4 @@
 /** @NotOnlyCurrentDoc */
-
-//1k tests//(3s-6s)getNames 35 test average = 4.3
 function getNames() {
   var times = []
   times.push(new Date().getTime())
@@ -11,7 +9,6 @@ function getNames() {
   times.push(new Date().getTime())
   format(profiles,hubSheet,times)
   }
-//1k tests//
 function format(profiles,hubSheet,times){
   var spreadsheet = SpreadsheetApp.getActive().getSheetByName(hubSheet.getRange("D1").getValue());
     spreadsheet.insertColumnsBefore(2,3*profiles[0].length)
@@ -31,20 +28,21 @@ function format(profiles,hubSheet,times){
 
 
 function form(profiles,hubSheet,spreadsheet,times){
-      //need FormApp.getActiveForm()??
-      FormApp.getActiveForm()
       for (i = 0; profiles[0].length != i; i++){
         var studentFolder = (DriveApp.getFoldersByName(new Date().getFullYear()).next().createFolder(profiles[0][i]))
         var form = ((FormApp.create(profiles[0][i] + "'s Longterm")));
         form.addScaleItem().setTitle('How would you rate the presentation').setBounds(1, 10);
         form.addParagraphTextItem().setTitle('Do you have any feedback for the presenter?');
-        studentFolder.getId().addFile(DriveApp.getFileById(form.getId()));
-        DriveApp.getRootFolder().removeFile(DriveApp.getFileById(form.getId()));
-        
+        var formid = form.getId( )
+        studentFolder.addFile(DriveApp.getFileById(formid));
+        DriveApp.getRootFolder().removeFile(DriveApp.getFileById(formid));
         }
-      //var studentSpreadsheet = SpreadsheetApp.create(studentName + "'s Longterm (Responses)").addEditor(Profiles[0][1]);
-      //form.setDestination(FormApp.DestinationType.SPREADSHEET, studentSpreadsheet.getId());
-      //studentFolder.addFile(DriveApp.getFileById(studentSpreadsheet.getId()));
-      //DriveApp.getRootFolder().removeFile(DriveApp.getFileById(studentSpreadsheet.getId()));
+        times.push(new Date().getTime())
+        for (i = 0; profiles[0].length != i; i++){
+        var studentSheet = SpreadsheetApp.create((profiles[0][i]) + "'s Longterm (Responses)");
+        var studentSheetId = studentSheet.getId( )
+        studentFolder.addFile(DriveApp.getFileById(studentSheetId));
+        DriveApp.getRootFolder().removeFile(DriveApp.getFileById(studentSheetId));
+        }
       times.push(new Date().getTime())
-      console.log('getNames:',(times[2]-times[1])/1000,'s      format:',(times[3]-times[2])/1000,'s      forms:',(times[4]-times[3])/1000,'s      total:',(times[4]-times[1])/1000)}
+      console.log('getNames:',(times[1]-times[0]),'ms      format:',(times[2]-times[1]),'ms      forms:',(times[3]-times[2])/1000,'s      sheets:',(times[4]-times[3])/1000,'s      total:',(times[4]-times[0])/1000,'s')}
