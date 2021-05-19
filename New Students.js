@@ -17,21 +17,19 @@ function forms(profiles,hubSheet,times){
       for (i = 0; profiles[0].length != i; i++){
         var studentFolder = (DriveApp.getFoldersByName(new Date().getFullYear()).next().createFolder(profiles[0][i]))
         var form = ((FormApp.create(profiles[0][i] + "'s Longterm")));
-        form.addScaleItem().setTitle('How would you rate the presentation').setBounds(1, 10);
-        form.addParagraphTextItem().setTitle('Do you have any feedback for the presenter?');
-        var formid = form.getId( )
-        studentFolder.addFile(DriveApp.getFileById(formid));
-        DriveApp.getRootFolder().removeFile(DriveApp.getFileById(formid));
+        form.addScaleItem().setTitle('How would you rate the presentation').setBounds(1, 10)
+        form.addParagraphTextItem().setTitle('Do you have any feedback for the presenter?')
+        form.setRequireLogin(false);
+        var formid = DriveApp.getFileById(form.getId())
+        studentFolder.addFile(formid).removeFile(formid);
         editFormUrl.push(form.getEditUrl())
         pubFormUrl.push(form.getPublishedUrl())
         }
         times.push(new Date().getTime())
         for (i = 0; profiles[0].length != i; i++){
-        var studentSheet = SpreadsheetApp.create((profiles[0][i]) + "'s Longterm (Responses)");
-        var studentSheetId = studentSheet.getId( )
-        studentFolder.addFile(DriveApp.getFileById(studentSheetId));
-        DriveApp.getRootFolder().removeFile(DriveApp.getFileById(studentSheetId));
-        sheetUrl.push(studentSheet.getUrl())
+        var studentSheetId = DriveApp.getFileById((SpreadsheetApp.create((profiles[0][i]) + "'s Longterm (Responses)")).getId());
+        studentFolder.addFile(studentSheetId).removeFile(studentSheetId);
+        sheetUrl.push(studentSheetId.getUrl())
         }
       times.push(new Date().getTime())
       profiles.push([editFormUrl],[pubFormUrl],[sheetUrl])
